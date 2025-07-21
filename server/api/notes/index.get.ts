@@ -9,7 +9,8 @@ export default defineEventHandler(async (event) => {
       text, 
       audio_urls AS audioUrls,
       created_at AS createdAt,
-      updated_at AS updatedAt
+      updated_at AS updatedAt,
+      share_id AS shareId
     FROM notes
     ORDER BY created_at DESC
     LIMIT 50;`

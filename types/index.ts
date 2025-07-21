@@ -10,6 +10,7 @@ export type Note = {
   audioUrls?: string[] | null;
   createdAt: string;
   updatedAt: string;
+  shareId?: string;
 };
 
 export type Settings = {

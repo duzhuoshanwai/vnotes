@@ -15,9 +15,9 @@ binding = "AI"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "notes-db"
-database_id = "474fd68e-d3c6-4882-ac74-0e68d1fdda7e"
+database_name = "vnote-db"
+database_id = "3bef7324-8cab-4c69-a095-fb39dd49e3b9"
 
 [[r2_buckets]]
+bucket_name = "vnote-bucket"
 binding = "R2"
-bucket_name = "notes-bucket"

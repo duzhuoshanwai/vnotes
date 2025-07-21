@@ -10,10 +10,11 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
+    const shareId = crypto.randomUUID();
     await cloudflare.env.DB.prepare(
-      'INSERT INTO notes (text, audio_urls) VALUES (?1, ?2)'
+      'INSERT INTO notes (text, audio_urls, share_id) VALUES (?1, ?2, ?3)'
     )
-      .bind(text, audioUrls ? JSON.stringify(audioUrls) : null)
+      .bind(text, audioUrls ? JSON.stringify(audioUrls) : null, shareId)
       .run();
 
     return setResponseStatus(event, 201);

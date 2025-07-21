@@ -16,9 +16,20 @@
         {{ showFullText ? 'Show less' : 'Show more' }}
       </UButton>
 
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        Created: {{ formatDate(note.createdAt) }}
-      </p>
+      <div class="flex items-center gap-x-4">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Created: {{ formatDate(note.createdAt) }}
+        </p>
+        <UButton
+          v-if="note.shareId"
+          icon="i-heroicons-share"
+          variant="link"
+          :padded="false"
+          @click="copyShareLink"
+        >
+          Copy Share Link
+        </UButton>
+      </div>
     </div>
 
     <div
@@ -39,7 +50,16 @@
 <script setup lang="ts">
 import type { Note } from '~~/types';
 
-defineProps<{ note: Note }>();
+const props = defineProps<{ note: Note }>();
+
+const copyShareLink = () => {
+  if (props.note.shareId) {
+    const shareUrl = `${window.location.origin}/share/${props.note.shareId}`;
+    navigator.clipboard.writeText(shareUrl);
+    // You might want to add a toast notification here to inform the user
+    // that the link has been copied.
+  }
+};
 
 const showFullText = ref(false);
 
