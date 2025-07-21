@@ -34,26 +34,33 @@
         }"
       >
         <template #header>
-          <h3
-            class="text-base md:text-lg font-medium text-gray-600 dark:text-gray-300"
-          >
-            Note recordings
-          </h3>
+          <div class="flex items-center justify-between w-full">
+            <h3
+              class="text-base md:text-lg font-medium text-gray-600 dark:text-gray-300"
+            >
+              Note recordings
+            </h3>
 
-          <UTooltip
-            :text="state.isRecording ? 'Stop Recording' : 'Start Recording'"
-          >
-            <UButton
-              :icon="
-                state.isRecording
-                  ? 'i-heroicons-stop-circle'
-                  : 'i-heroicons-microphone'
-              "
-              :color="state.isRecording ? 'red' : 'primary'"
-              :loading="isTranscribing"
-              @click="toggleRecording"
-            />
-          </UTooltip>
+            <div class="flex items-center gap-x-4">
+              <UTooltip text="Enable transcription">
+                <UToggle v-model="settings.transcriptionEnabled" />
+              </UTooltip>
+              <UTooltip
+                :text="state.isRecording ? 'Stop Recording' : 'Start Recording'"
+              >
+                <UButton
+                  :icon="
+                    state.isRecording
+                      ? 'i-heroicons-stop-circle'
+                      : 'i-heroicons-microphone'
+                  "
+                  :color="state.isRecording ? 'red' : 'primary'"
+                  :loading="isTranscribing"
+                  @click="toggleRecording"
+                />
+              </UTooltip>
+            </div>
+          </div>
         </template>
 
         <AudioVisualizer
@@ -153,27 +160,29 @@ const handleRecordingStop = async () => {
   }
 
   if (blob) {
-    try {
-      const transcription = await transcribeAudio(blob);
+    if (settings.value.transcriptionEnabled) {
+      try {
+        const transcription = await transcribeAudio(blob);
 
-      console.log('transcription:', transcription);
+        console.log('transcription:', transcription);
 
-      note.value += note.value ? '\n\n' : '';
-      note.value += transcription ?? '';
-
-      recordings.value.unshift({
-        url: URL.createObjectURL(blob),
-        blob,
-        id: `${Date.now()}`,
-      });
-    } catch (err) {
-      console.error('Error transcribing audio:', err);
-      useToast().add({
-        title: 'Error',
-        description: 'Failed to transcribe audio. Please try again.',
-        color: 'red',
-      });
+        note.value += note.value ? '\n\n' : '';
+        note.value += transcription ?? '';
+      } catch (err) {
+        console.error('Error transcribing audio:', err);
+        useToast().add({
+          title: 'Error',
+          description: 'Failed to transcribe audio. Please try again.',
+          color: 'red',
+        });
+      }
     }
+
+    recordings.value.unshift({
+      url: URL.createObjectURL(blob),
+      blob,
+      id: `${Date.now()}`,
+    });
   }
 };
 
@@ -185,7 +194,8 @@ const toggleRecording = () => {
   }
 };
 
-const postProcessSettings = useStorageAsync<Settings>('vNotesSettings', {
+const settings = useStorageAsync<Settings>('vNotesSettings', {
+  transcriptionEnabled: false,
   postProcessingEnabled: false,
   postProcessingPrompt: '',
 });
@@ -197,10 +207,10 @@ const transcribeAudio = async (blob: Blob) => {
     formData.append('audio', blob);
 
     if (
-      postProcessSettings.value.postProcessingEnabled &&
-      postProcessSettings.value.postProcessingPrompt
+      settings.value.postProcessingEnabled &&
+      settings.value.postProcessingPrompt
     ) {
-      formData.append('prompt', postProcessSettings.value.postProcessingPrompt);
+      formData.append('prompt', settings.value.postProcessingPrompt);
     }
 
     return await $fetch('/api/transcribe', {
@@ -253,7 +263,8 @@ const saveNote = async () => {
       description: 'Failed to save note',
       color: 'red',
     });
-  } finally {
+  }
+  finally {
     loading.value = false;
   }
 };

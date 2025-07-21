@@ -14,6 +14,7 @@ export type Note = {
 };
 
 export type Settings = {
+  transcriptionEnabled: boolean;
   postProcessingEnabled: boolean;
   postProcessingPrompt: string;
 };
