@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   for (const file of files) {
     const obj = await cloudflare.env.R2.put(`recordings/${file.name}`, file);
     if (obj) {
-      uploadKeys.push(obj.key);
+      uploadKeys.push(`/${obj.key}`);
     }
   }
 

@@ -5,6 +5,18 @@
         <h1 class="text-2xl font-bold">Shared Note</h1>
       </template>
       <p class="text-gray-700 dark:text-gray-300">{{ note.text }}</p>
+      <div
+        v-if="note.audioUrls && note.audioUrls.length > 0"
+        class="mt-6 flex gap-x-2 overflow-x-auto"
+      >
+        <audio
+          v-for="url in note.audioUrls"
+          :key="url"
+          :src="url"
+          controls
+          class="w-60 shrink-0 h-10"
+        />
+      </div>
       <template #footer>
         <p class="text-sm text-gray-500">
           Created on: {{ new Date(note.created_at).toLocaleString() }}

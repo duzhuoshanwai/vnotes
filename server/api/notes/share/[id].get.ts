@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const note = await cloudflare.env.DB.prepare(
+    const note: { audio_urls: string | null } | null = await cloudflare.env.DB.prepare(
       'SELECT id, text, created_at, audio_urls FROM notes WHERE share_id = ?1'
     )
       .bind(shareId)
@@ -23,7 +23,10 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return note;
+    return {
+      ...note,
+      audioUrls: note.audio_urls ? JSON.parse(note.audio_urls) : undefined,
+    };
   } catch (err) {
     console.error('Error fetching note by share ID:', err);
     throw createError({
