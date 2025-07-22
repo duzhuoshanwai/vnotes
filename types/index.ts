@@ -11,6 +11,7 @@ export type Note = {
   createdAt: string;
   updatedAt: string;
   shareId?: string;
+  duration?: number;
 };
 
 export type Settings = {

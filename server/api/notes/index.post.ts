@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   const { cloudflare } = event.context;
 
-  const { text, audioUrls } = await readBody(event);
+  const { text, audioUrls, duration } = await readBody(event);
   if (!text) {
     throw createError({
       statusCode: 400,
@@ -12,9 +12,14 @@ export default defineEventHandler(async (event) => {
   try {
     const shareId = crypto.randomUUID();
     await cloudflare.env.DB.prepare(
-      'INSERT INTO notes (text, audio_urls, share_id) VALUES (?1, ?2, ?3)'
+      'INSERT INTO notes (text, audio_urls, share_id, duration) VALUES (?1, ?2, ?3, ?4)'
     )
-      .bind(text, audioUrls ? JSON.stringify(audioUrls) : null, shareId)
+      .bind(
+        text,
+        audioUrls ? JSON.stringify(audioUrls) : null,
+        shareId,
+        duration
+      )
       .run();
 
     return setResponseStatus(event, 201);

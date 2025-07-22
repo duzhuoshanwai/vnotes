@@ -42,6 +42,12 @@
             </h3>
 
             <div class="flex items-center gap-x-4">
+              <span
+                v-if="state.isRecording"
+                class="font-mono tabular-nums text-gray-500 dark:text-gray-400"
+              >
+                {{ formatDuration(state.recordingDuration) }}
+              </span>
               <UTooltip text="Enable transcription">
                 <UToggle v-model="settings.transcriptionEnabled" />
               </UTooltip>
@@ -131,6 +137,7 @@ const loading = ref(false);
 const isTranscribing = ref(false);
 const { state, startRecording, stopRecording } = useMediaRecorder();
 const recordings = ref<Recording[]>([]);
+const finalDuration = ref(0);
 
 const handleRecordingStart = async () => {
   try {
@@ -146,6 +153,7 @@ const handleRecordingStart = async () => {
 };
 
 const handleRecordingStop = async () => {
+  finalDuration.value = state.value.recordingDuration;
   let blob: Blob | undefined;
 
   try {
@@ -194,6 +202,14 @@ const toggleRecording = () => {
   }
 };
 
+const formatDuration = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds
+    .toString()
+    .padStart(2, '0')}`;
+};
+
 const settings = useStorageAsync<Settings>('vNotesSettings', {
   transcriptionEnabled: false,
   postProcessingEnabled: false,
@@ -232,9 +248,13 @@ const saveNote = async () => {
 
   loading.value = true;
 
-  const noteToSave: { text: string; audioUrls?: string[] } = {
+  const noteToSave: { text: string; audioUrls?: string[]; duration?: number } = {
     text: note.value.trim(),
   };
+
+  if (recordings.value.length) {
+    noteToSave.duration = finalDuration.value;
+  }
 
   try {
     if (recordings.value.length) {

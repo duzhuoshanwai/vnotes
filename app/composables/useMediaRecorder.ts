@@ -49,7 +49,17 @@ export function useMediaRecorder() {
 
       mediaRecorder.ondataavailable = (e: BlobEvent) => {
         audioChunks?.push(e.data);
-        state.value.recordingDuration += 1;
+      };
+
+      mediaRecorder.onstart = () => {
+        state.value.recordingDuration = 0;
+        const timer = setInterval(() => {
+          if (state.value.isRecording) {
+            state.value.recordingDuration += 1;
+          } else {
+            clearInterval(timer);
+          }
+        }, 1000);
       };
 
       state.value.audioData = new Uint8Array(analyser.frequencyBinCount);
