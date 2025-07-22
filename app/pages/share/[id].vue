@@ -4,17 +4,17 @@
       <template #header>
         <h1 class="text-2xl font-bold">Shared Note</h1>
       </template>
-      <p class="text-gray-700 dark:text-gray-300">{{ note.text }}</p>
+      <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ note.text }}</p>
       <div
         v-if="note.audioUrls && note.audioUrls.length > 0"
-        class="mt-6 flex gap-x-2 overflow-x-auto"
+        class="mt-6 flex flex-col gap-y-2"
       >
         <audio
           v-for="url in note.audioUrls"
           :key="url"
           :src="url"
           controls
-          class="w-60 shrink-0 h-10"
+          class="w-full h-10"
         />
       </div>
       <template #footer>

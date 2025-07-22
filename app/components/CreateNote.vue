@@ -24,6 +24,8 @@
           autofocus
           :disabled="loading || isTranscribing || state.isRecording"
           :rows="10"
+          resize
+          class="resize-y"
         />
       </UCard>
 
