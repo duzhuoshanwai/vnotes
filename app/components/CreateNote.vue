@@ -138,8 +138,7 @@ const note = ref('');
 const loading = ref(false);
 const isTranscribing = ref(false);
 const { state, startRecording, stopRecording } = useMediaRecorder();
-const recordings = ref<Recording[]>([]);
-const finalDuration = ref(0);
+const recordings = ref<(Recording & { duration: number })[]>([]);
 
 const handleRecordingStart = async () => {
   try {
@@ -155,7 +154,7 @@ const handleRecordingStart = async () => {
 };
 
 const handleRecordingStop = async () => {
-  finalDuration.value = state.value.recordingDuration;
+  const duration = state.value.recordingDuration;
   let blob: Blob | undefined;
 
   try {
@@ -192,6 +191,7 @@ const handleRecordingStop = async () => {
       url: URL.createObjectURL(blob),
       blob,
       id: `${Date.now()}`,
+      duration,
     });
   }
 };
@@ -255,7 +255,7 @@ const saveNote = async () => {
   };
 
   if (recordings.value.length) {
-    noteToSave.duration = finalDuration.value;
+    noteToSave.duration = recordings.value.reduce((acc, r) => acc + r.duration, 0);
   }
 
   try {

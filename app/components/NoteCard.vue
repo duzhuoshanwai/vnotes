@@ -20,6 +20,9 @@
         <p class="text-sm text-gray-500 dark:text-gray-400">
           Created: {{ formatDate(note.createdAt) }}
         </p>
+        <p v-if="note.duration" class="text-sm text-gray-500 dark:text-gray-400">
+          Duration: {{ formatDuration(note.duration) }}
+        </p>
         <UButton
           v-if="note.shareId"
           icon="i-heroicons-share"
@@ -65,6 +68,15 @@ const copyShareLink = () => {
 };
 
 const showFullText = ref(false);
+
+const formatDuration = (seconds: number) => {
+  if (!seconds) return '00:00';
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.round(seconds % 60);
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds
+    .toString()
+    .padStart(2, '0')}`;
+};
 
 const formatDate = (time: string) => {
   const date = new Date(time);
