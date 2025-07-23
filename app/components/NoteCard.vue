@@ -56,8 +56,11 @@ const copyShareLink = () => {
   if (props.note.shareId) {
     const shareUrl = `${window.location.origin}/share/${props.note.shareId}`;
     navigator.clipboard.writeText(shareUrl);
-    // You might want to add a toast notification here to inform the user
-    // that the link has been copied.
+    useToast().add({
+      title: 'Success',
+      description: 'Share link copied to clipboard!',
+      color: 'green',
+    });
   }
 };
 

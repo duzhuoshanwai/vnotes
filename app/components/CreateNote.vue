@@ -188,7 +188,7 @@ const handleRecordingStop = async () => {
       }
     }
 
-    recordings.value.unshift({
+    recordings.value.push({
       url: URL.createObjectURL(blob),
       blob,
       id: `${Date.now()}`,

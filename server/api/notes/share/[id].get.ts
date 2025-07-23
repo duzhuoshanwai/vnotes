@@ -1,3 +1,5 @@
+import { transformNote } from '../../../utils/transformNote';
+
 export default defineEventHandler(async (event) => {
   const { cloudflare } = event.context;
   const shareId = getRouterParam(event, 'id');
@@ -10,12 +12,11 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const note: { audio_urls: string | null; duration: number | null } | null =
-      await cloudflare.env.DB.prepare(
-        'SELECT id, text, created_at, audio_urls, duration FROM notes WHERE share_id = ?1'
-      )
-        .bind(shareId)
-        .first();
+    const note = await cloudflare.env.DB.prepare(
+      'SELECT * FROM notes WHERE share_id = ?1'
+    )
+      .bind(shareId)
+      .first();
 
     if (!note) {
       throw createError({
@@ -24,10 +25,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return {
-      ...note,
-      audioUrls: note.audio_urls ? JSON.parse(note.audio_urls) : undefined,
-    };
+    return transformNote(note);
   } catch (err) {
     console.error('Error fetching note by share ID:', err);
     throw createError({

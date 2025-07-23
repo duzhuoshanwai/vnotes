@@ -1,23 +1,15 @@
-import type { Note } from '~~/types';
+import { transformNote } from '../../utils/transformNote';
 
 export default defineEventHandler(async (event) => {
   const { cloudflare } = event.context;
 
-  const res = await cloudflare.env.DB.prepare(
-    `SELECT 
-      id, 
-      text, 
-      audio_urls AS audioUrls,
-      created_at AS createdAt,
-      updated_at AS updatedAt,
-      share_id AS shareId
-    FROM notes
-    ORDER BY created_at DESC
-    LIMIT 50;`
-  ).all<Omit<Note, 'audioUrls'> & { audioUrls: string | null }>();
+  const { results } = await cloudflare.env.DB.prepare(
+    `SELECT * FROM notes ORDER BY created_at DESC LIMIT 50;`
+  ).all();
 
-  return res.results.map((note) => ({
-    ...note,
-    audioUrls: note.audioUrls ? JSON.parse(note.audioUrls) : undefined,
-  }));
+  if (!results) {
+    return [];
+  }
+
+  return results.map(transformNote);
 });
